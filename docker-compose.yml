@@ -1,0 +1,39 @@
+services:
+  database:
+    image: postgres:16
+    container_name: BaseDatos_Examen
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: clave123
+      POSTGRES_DB: postgres
+    volumes:
+      - db:/var/lib/postgresql/data
+
+  server:
+    depends_on:
+      - database
+    build: ./backend
+    container_name: backend_Examen
+    ports:
+      - "${BACKEND_PORT}:3001"
+    develop:
+      watch:
+        - action: sync
+          path: ./backend
+          target: /app/backend
+
+  client:
+    build: ./frontend
+    container_name: frontend_Examen
+    ports:
+      - "${FRONTEND_PORT}:3000"
+    develop:
+      watch:
+        - action: sync
+          path: ./frontend/src
+          target: /app/src
+
+volumes:
+  db:
